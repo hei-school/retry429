@@ -16,7 +16,13 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.10
       Architectures:
-      - arm64
+        - arm64
+      Events:
+        AnyCall:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: any
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
@@ -37,3 +43,5 @@ Outputs:
     Value: !GetAtt Retry429Function.Arn
   Retry429FunctionIamRole:
     Value: !GetAtt Retry429FunctionRole.Arn
+  Retry429HttpApiUrl:
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"

@@ -15,5 +15,6 @@ Also retries those that end into 500 as 429 are often wrongly typed into 500.
    By default, retries are done 3 times within a timeframe of 10 seconds.
 5. Perform any additional configuration for the lambda.
    Typically you want to put it into your private subnets if `retryable_url` can only be accessed there.
+   You also want to configure CORS for the generated HttpAPI in API Gateway if the original calls come from browsers.
 6. Monitor retried 429 through the Log Insights associated with the lambda function.
    Tell your backend developers to reduce them over time!

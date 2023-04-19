@@ -1,0 +1,51 @@
+{
+    "version": "2.0",
+    "routeKey": "ANY /{proxy+}",
+    "rawPath": "/thepath",
+    "rawQueryString": "param1=value1",
+    "headers": {
+      "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "accept-encoding": "gzip, deflate, br",
+      "accept-language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+      "content-length": "0",
+      "host": "retry.bpartners.app",
+      "sec-ch-ua": "\"Chromium\";v=\"112\", \"Google Chrome\";v=\"112\", \"Not:A-Brand\";v=\"99\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": "\"macOS\"",
+      "sec-fetch-dest": "document",
+      "sec-fetch-mode": "navigate",
+      "sec-fetch-site": "none",
+      "sec-fetch-user": "?1",
+      "upgrade-insecure-requests": "1",
+      "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36",
+      "x-amzn-trace-id": "Root=1-64427bef-26647661444223b24b24329e",
+      "x-forwarded-for": "178.208.16.70",
+      "x-forwarded-port": "443",
+      "x-forwarded-proto": "https"
+    },
+    "queryStringParameters": {
+      "param1": "value1"
+    },
+    "requestContext": {
+      "accountId": "688605879718",
+      "apiId": "bemwo6hr5b",
+      "domainName": "retry.bpartners.app",
+      "domainPrefix": "retry",
+      "http": {
+        "method": "GET",
+        "path": "/thepath",
+        "protocol": "HTTP/1.1",
+        "sourceIp": "178.208.16.70",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+      },
+      "requestId": "DuhNhhcyCGYEJog=",
+      "routeKey": "ANY /{proxy+}",
+      "stage": "$default",
+      "time": "21/Apr/2023:12:05:03 +0000",
+      "timeEpoch": 1682078703808
+    },
+    "pathParameters": {
+      "proxy": "thepath"
+    },
+    "isBase64Encoded": false
+  }
