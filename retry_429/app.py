@@ -18,11 +18,11 @@ def to_retryable_url(original_host, path):
        so that retry429 is not infinitely looping over itself"""
     return "http://" + to_retryable_host(original_host) + path
 
-def reject_429(response, endpoint):
+def reject_429(response, host, endpoint):
     if response.status_code == 429:
-        raise Exception(f"Definite 429: {endpoint}")
+        raise Exception(f"Definite 429: {host}, {endpoint}")
     if response.status_code == 500:
-        raise Exception(f"Suspicious 429: {endpoint}")
+        raise Exception(f"Suspicious 500: {host}, {endpoint}")
     return response
 
 def to_base64(content):
@@ -34,15 +34,20 @@ def lambda_handler(event, context):
     path = httpContext["path"]
     endpoint = f"{method} {path}"
     headers = event["headers"]
+    payload = event.get("body", None)
+    utf8_payload = None if payload is None else payload.encode("utf-8")
+
     original_host = headers["host"]
+    retryable_host = to_retryable_host(original_host)
     request_rejecting_429 = lambda: reject_429(
         requests.request(
             method=method,
-            headers={**headers, "Host": to_retryable_host(original_host)},
+            headers={**headers, "Host": retryable_host},
             url=to_retryable_url(original_host, path),
             params=event.get("queryStringParameters", None),
-            data=event.get("body", None)
+            data=utf8_payload
         ),
+        retryable_host,
         endpoint
     )
     
@@ -61,7 +66,7 @@ def lambda_handler(event, context):
             "isBase64Encoded": True
         }
     except avereno.GiveUpRetryError:
-        error_message = f"GiveUpRetryError after max_sleep={max_sleep}: {endpoint}"
+        error_message = f"GiveUpRetryError after max_sleep={max_sleep}: {retryable_host}, {endpoint}"
         logger.error(error_message)
         return {
             "statusCode": 500,
