@@ -3,6 +3,7 @@ import json
 import avereno
 import logging
 import datetime
+import base64
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -23,6 +24,9 @@ def reject_429(response, endpoint):
     if response.status_code == 500:
         raise Exception(f"Suspicious 429: {endpoint}")
     return response
+
+def to_base64(content):
+    return base64.b64encode(content).decode()
 
 def lambda_handler(event, context):
     httpContext = event["requestContext"]["http"]
@@ -53,7 +57,8 @@ def lambda_handler(event, context):
         )
         return {
             "statusCode": response.status_code,
-            "body": response.content
+            "body": to_base64(response.content),
+            "isBase64Encoded": True
         }
     except avereno.GiveUpRetryError:
         error_message = f"GiveUpRetryError after max_sleep={max_sleep}: {endpoint}"
