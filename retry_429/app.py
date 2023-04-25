@@ -36,12 +36,18 @@ def lambda_handler(event, context):
     method = httpContext["method"]
     path = httpContext["path"]
     endpoint = f"{method} {path}"
-    headers = event["headers"]
-    payload = event.get("body", None)
 
-    # TODO: encode only when content-type is None or text/plain-utf8
-    # In particular: do not encode xls
-    utf8_payload = None if payload is None else payload.encode("utf-8")
+    headers = event["headers"]
+    content_type = headers.get("content-type", None)
+    is_content_text = content_type is None or "json" in content_type or "text" in content_type
+    is_content_xls = content_type is not None and "xls" in content_type
+    payload = event.get("body", None)
+    if payload is None:
+        encoded_payload = None
+    elif is_content_text:
+        encoded_payload = payload.encode("utf-8")
+    elif is_content_xls:
+        encoded_payload = base64.b64decode(payload)
 
     original_host = headers["host"]
     retryable_host = to_retryable_host(original_host)
@@ -51,7 +57,7 @@ def lambda_handler(event, context):
             headers={**headers, "Host": retryable_host},
             url=to_retryable_url(original_host, path),
             params=event.get("queryStringParameters", None),
-            data=utf8_payload
+            data=encoded_payload
         ),
         retryable_host,
         endpoint
