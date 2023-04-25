@@ -38,6 +38,9 @@ def lambda_handler(event, context):
     endpoint = f"{method} {path}"
     headers = event["headers"]
     payload = event.get("body", None)
+
+    # TODO: encode only when content-type is None or text/plain-utf8
+    # In particular: do not encode xls
     utf8_payload = None if payload is None else payload.encode("utf-8")
 
     original_host = headers["host"]
