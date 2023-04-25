@@ -28,6 +28,9 @@ def reject_429(response, host, endpoint):
 def to_base64(content):
     return base64.b64encode(content).decode()
 
+def case_insensitive_obj_to_serializable_dict(obj):
+    return json.loads(json.dumps(dict(obj)))
+
 def lambda_handler(event, context):
     httpContext = event["requestContext"]["http"]
     method = httpContext["method"]
@@ -63,6 +66,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": response.status_code,
             "body": to_base64(response.content),
+            "headers": case_insensitive_obj_to_serializable_dict(response.headers),
             "isBase64Encoded": True
         }
     except avereno.GiveUpRetryError:
