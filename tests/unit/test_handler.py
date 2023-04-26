@@ -21,6 +21,10 @@ def apigw_post_non_b64_event():
 def apigw_post_b64_event():
     return read_filepath_content("./events/post_b64.json")
 
+@pytest.fixture()
+def apigw_get_with_query_params_event():
+    return read_filepath_content("./events/get_with_query_params.json")
+
 @responses.activate
 def test_ping(apigw_ping_event):
     responses.add(
@@ -124,6 +128,17 @@ def test_post_b64(apigw_post_b64_event):
         status=200)
 
     response = app.lambda_handler(apigw_post_b64_event, "")
+
+    assert response["statusCode"] == 200
+
+@responses.activate
+def test_query_params_are_forwarded(apigw_get_with_query_params_event):
+    responses.add(
+        responses.GET,
+        "http://private-api-preprod.bpartners.app/thepath?param1=value1",
+        status=200)
+
+    response = app.lambda_handler(apigw_get_with_query_params_event, "")
 
     assert response["statusCode"] == 200
 
