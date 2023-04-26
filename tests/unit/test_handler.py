@@ -126,3 +126,5 @@ def test_post_b64(apigw_post_b64_event):
     response = app.lambda_handler(apigw_post_b64_event, "")
 
     assert response["statusCode"] == 200
+
+# TODO: (1) url parameters (2) request headers (3) response headers
