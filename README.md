@@ -18,3 +18,12 @@ Also retries those that end into 500 as 429 are often wrongly typed into 500.
    You also want to configure CORS for the generated HttpAPI in API Gateway if the original calls come from browsers.
 6. Monitor retried 429 through the Log Insights associated with the lambda function.
    Tell your backend developers to reduce them over time!
+
+## Tests
+
+Tests are defined in the `tests` folder in this project. Use PIP to install the test dependencies and run tests.
+
+```bash
+$ pip install -r tests/requirements.txt --user
+$ python -m pytest tests/unit -v
+```

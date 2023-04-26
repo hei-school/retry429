@@ -31,24 +31,21 @@ def to_base64(content):
 def case_insensitive_obj_to_serializable_dict(obj):
     return json.loads(json.dumps(dict(obj)))
 
+def encoded_payload_from_event(event):
+    payload = event.get("body", None)
+    if payload is None:
+        return None
+    elif event.get("isBase64Encoded", False):
+        return base64.b64decode(payload)
+    else:
+        return payload.encode("utf-8")
+
 def lambda_handler(event, context):
     httpContext = event["requestContext"]["http"]
     method = httpContext["method"]
     path = httpContext["path"]
     endpoint = f"{method} {path}"
-
     headers = event["headers"]
-    content_type = headers.get("content-type", None)
-    is_content_text = content_type is None or "json" in content_type or "text" in content_type
-    is_content_xls = content_type is not None and "xls" in content_type
-    payload = event.get("body", None)
-    if payload is None:
-        encoded_payload = None
-    elif is_content_text:
-        encoded_payload = payload.encode("utf-8")
-    elif is_content_xls:
-        encoded_payload = base64.b64decode(payload)
-
     original_host = headers["host"]
     retryable_host = to_retryable_host(original_host)
     request_rejecting_429 = lambda: reject_429(
@@ -57,7 +54,7 @@ def lambda_handler(event, context):
             headers={**headers, "Host": retryable_host},
             url=to_retryable_url(original_host, path),
             params=event.get("queryStringParameters", None),
-            data=encoded_payload
+            data=encoded_payload_from_event(event)
         ),
         retryable_host,
         endpoint
