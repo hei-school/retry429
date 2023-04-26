@@ -37,6 +37,6 @@
   "pathParameters": {
     "proxy": "thepath"
   },
-  "body": "The Body",
+  "body": "{\"foo\":\"bar €\"}",
   "isBase64Encoded": false
 }
