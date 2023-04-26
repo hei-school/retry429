@@ -36,6 +36,13 @@ def test_ping(apigw_ping_event):
     assert response["body"]  == "cG9uZw==" # "pong", for non-base64 fluent folks
 
 @responses.activate
+def test_ping_but_ping_is_unknown(apigw_ping_event):
+    response = app.lambda_handler(apigw_ping_event, "")
+
+    assert response["statusCode"] == 500
+    assert "GiveUpRetryError" in response["body"]
+
+@responses.activate
 def test_post_non_b64(apigw_post_non_b64_event):
     responses.add(
         responses.POST,
