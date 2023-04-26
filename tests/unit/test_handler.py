@@ -25,6 +25,10 @@ def apigw_post_b64_event():
 def apigw_get_with_query_params_event():
     return read_filepath_content("./events/get_with_query_params.json")
 
+@pytest.fixture()
+def apigw_get_with_two_headers_event():
+    return read_filepath_content("./events/get_with_two_headers.json")
+
 @responses.activate
 def test_ping(apigw_ping_event):
     responses.add(
@@ -142,4 +146,26 @@ def test_query_params_are_forwarded(apigw_get_with_query_params_event):
 
     assert response["statusCode"] == 200
 
-# TODO: (1) url parameters (2) request headers (3) response headers
+@responses.activate
+def test_headers_are_forwarded(apigw_get_with_two_headers_event):
+    responses.add(
+        responses.GET,
+        "http://private-api-preprod.bpartners.app/thepath?param1=value1",
+        match=[
+            matchers.header_matcher({
+                "host": "private-api-preprod.bpartners.app",
+                "user-agent": "Mozilla/5.0"
+            })
+        ],
+        status=200,
+        headers={"A-Response-Header": "a header value"}
+    )
+
+    response = app.lambda_handler(apigw_get_with_two_headers_event, "")
+
+    assert response["statusCode"] == 200
+    assert response["headers"] == {
+        "A-Response-Header": "a header value",
+        # content-type is always text as we systematically encode to base64
+        "Content-Type": "text/plain"
+    }

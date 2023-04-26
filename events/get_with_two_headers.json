@@ -1,0 +1,35 @@
+{
+    "version": "2.0",
+    "routeKey": "ANY /{proxy+}",
+    "rawPath": "/thepath",
+    "rawQueryString": "param1=value1",
+    "headers": {
+      "host": "api-preprod.bpartners.app",
+      "user-agent": "Mozilla/5.0"
+    },
+    "queryStringParameters": {
+      "param1": "value1"
+    },
+    "requestContext": {
+      "accountId": "688605879718",
+      "apiId": "bemwo6hr5b",
+      "domainName": "api-preprod.bpartners.app",
+      "domainPrefix": "retry",
+      "http": {
+        "method": "GET",
+        "path": "/thepath",
+        "protocol": "HTTP/1.1",
+        "sourceIp": "178.208.16.70",
+        "userAgent": "Mozilla/5.0"
+      },
+      "requestId": "DuhNhhcyCGYEJog=",
+      "routeKey": "ANY /{proxy+}",
+      "stage": "$default",
+      "time": "21/Apr/2023:12:05:03 +0000",
+      "timeEpoch": 1682078703808
+    },
+    "pathParameters": {
+      "proxy": "thepath"
+    },
+    "isBase64Encoded": false
+  }

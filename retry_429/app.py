@@ -51,7 +51,7 @@ def lambda_handler(event, context):
     request_rejecting_429 = lambda: reject_429(
         requests.request(
             method=method,
-            headers={**headers, "Host": retryable_host},
+            headers={**headers, "host": retryable_host},
             url=to_retryable_url(original_host, path),
             params=event.get("queryStringParameters", None),
             data=encoded_payload_from_event(event)
