@@ -1,0 +1,42 @@
+{
+  "version": "2.0",
+  "routeKey": "ANY /{proxy+}",
+  "rawPath": "/thepath",
+  "rawQueryString": "",
+  "headers": {
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, br",
+    "content-length": "8",
+    "content-type": "text/plain",
+    "host": "api-preprod.bpartners.app",
+    "postman-token": "3cbeacb8-559a-4d07-bf32-8f6d01f816ec",
+    "user-agent": "PostmanRuntime/7.32.2",
+    "x-amzn-trace-id": "Root=1-64426217-5725f40c051dbfd44580bb0e",
+    "x-forwarded-for": "178.208.16.70",
+    "x-forwarded-port": "443",
+    "x-forwarded-proto": "https"
+  },
+  "requestContext": {
+    "accountId": "688605879718",
+    "apiId": "bemwo6hr5b",
+    "domainName": "api-preprod.bpartners.app",
+    "domainPrefix": "retry",
+    "http": {
+      "method": "POST",
+      "path": "/thepath",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "178.208.16.70",
+      "userAgent": "PostmanRuntime/7.32.2"
+    },
+    "requestId": "DuRDwjGXCGYEMJA=",
+    "routeKey": "ANY /{proxy+}",
+    "stage": "$default",
+    "time": "21/Apr/2023:10:14:47 +0000",
+    "timeEpoch": 1682072087759
+  },
+  "pathParameters": {
+    "proxy": "thepath"
+  },
+  "body": "eyAiZm9vIjogImJhciDigqwiIH0=",
+  "isBase64Encoded": true
+}

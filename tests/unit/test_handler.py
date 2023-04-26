@@ -17,6 +17,10 @@ def apigw_ping_event():
 def apigw_post_non_b64_event():
     return read_filepath_content("./events/post_non_b64.json")
 
+@pytest.fixture()
+def apigw_post_b64_event():
+    return read_filepath_content("./events/post_b64.json")
+
 @responses.activate
 def test_ping(apigw_ping_event):
     responses.add(
@@ -42,5 +46,19 @@ def test_post_non_b64(apigw_post_non_b64_event):
         status=200)
 
     response = app.lambda_handler(apigw_post_non_b64_event, "")
+
+    assert response["statusCode"] == 200
+
+@responses.activate
+def test_post_b64(apigw_post_b64_event):
+    responses.add(
+        responses.POST,
+        "http://private-api-preprod.bpartners.app/thepath",
+        match=[
+            matchers.json_params_matcher({ "foo": "bar €" })
+        ],
+        status=200)
+
+    response = app.lambda_handler(apigw_post_b64_event, "")
 
     assert response["statusCode"] == 200
