@@ -2,11 +2,32 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: retry429
 
+Parameters:
+  TargetHostTemplate:
+    Type: String
+    Description: |
+      The host to target.
+      Use <original_host> if you need to refer to the name under which the proxy is hosted.
+      Typically, it is the domain name (generated or custom) that points to the generated API Gateway.
+  TargetProtocol:
+    Type: String
+    AllowedValues:
+      - http
+      - https
+  RetriedHttpStatuses:
+    Type: String
+    Description: Comma-separated HTTP statuses such as 420-503
+
 Globals:
   Function:
     Timeout: 600
     MemorySize: 128
     Tracing: Active
+    Environment:
+      Variables:
+        TargetHostTemplate: !Ref TargetHostTemplate
+        TargetProtocol: !Ref TargetProtocol
+        RetriedHttpStatuses: !Ref RetriedHttpStatuses
 
 Resources:
   Retry429Function:

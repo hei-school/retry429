@@ -10,18 +10,17 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def to_retryable_host(original_host):
-    target_host_template = os.environ['TARGET_HOST_TEMPLATE']
-    return target_host_template.replace("<original_host>", original_host)
+    TargetHostTemplate = os.environ["TargetHostTemplate"]
+    return TargetHostTemplate.replace("<original_host>", original_host)
 
 def to_retryable_url(original_host, path):
-    protocol = os.environ['TARGET_PROTOCOL']
+    protocol = os.environ["TargetProtocol"]
     return f"{protocol}://{to_retryable_host(original_host)}{path}"
 
-def reject_429(response, host, endpoint):
-    if response.status_code == 429:
-        raise Exception(f"Definite 429: {host}, {endpoint}")
-    if response.status_code == 500:
-        raise Exception(f"Suspicious 500: {host}, {endpoint}")
+def reject_bad_http_statuses(response, host, endpoint):
+    RetriedHttpStatuses = os.environ.get("RetriedHttpStatuses", "")
+    if str(response.status_code) in RetriedHttpStatuses:
+        raise Exception(f"Rejected {response.status_code}: {host}, {endpoint}")
     return response
 
 def to_base64(content):
@@ -47,7 +46,7 @@ def lambda_handler(event, context):
     headers = event["headers"]
     original_host = headers["host"]
     retryable_host = to_retryable_host(original_host)
-    request_rejecting_429 = lambda: reject_429(
+    request_rejecting_bad_http_statuses = lambda: reject_bad_http_statuses(
         requests.request(
             method=method,
             headers={**headers, "host": retryable_host},
@@ -62,7 +61,7 @@ def lambda_handler(event, context):
     max_sleep = datetime.timedelta(seconds=10)
     try:
         response = avereno.retry(
-            request_rejecting_429,
+            request_rejecting_bad_http_statuses,
             max_sleep=max_sleep,
             on_retry=lambda current_nb_retries, current_error: logger.error(
                 f"Retry no.{current_nb_retries} after error: {current_error}"
