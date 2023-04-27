@@ -1,4 +1,6 @@
 import pytest
+from unittest import TestCase, mock
+import os
 import json
 import responses
 from responses import matchers
@@ -29,6 +31,7 @@ def apigw_get_with_query_params_event():
 def apigw_get_with_two_headers_event():
     return read_filepath_content("./events/get_with_two_headers.json")
 
+@mock.patch.dict(os.environ, { "TARGET_HOST_TEMPLATE": "private-<original_host>", "TARGET_PROTOCOL": "http" })
 @responses.activate
 def test_ping(apigw_ping_event):
     responses.add(
@@ -43,6 +46,7 @@ def test_ping(apigw_ping_event):
     assert response["isBase64Encoded"]  == True
     assert response["body"]  == "cG9uZw==" # "pong", for non-base64 fluent folks
 
+@mock.patch.dict(os.environ, { "TARGET_HOST_TEMPLATE": "private-<original_host>", "TARGET_PROTOCOL": "http" })
 @responses.activate
 def test_ping_is_unknown(apigw_ping_event):
     response = app.lambda_handler(apigw_ping_event, "")
@@ -50,31 +54,33 @@ def test_ping_is_unknown(apigw_ping_event):
     assert response["statusCode"] == 500
     assert "GiveUpRetryError" in response["body"]
 
+@mock.patch.dict(os.environ, { "TARGET_HOST_TEMPLATE": "internal-<original_host>", "TARGET_PROTOCOL": "https" })
 @responses.activate
 def test_ping_is_eventually_known(apigw_ping_event):
     # 1 try
     responses.add(
         responses.GET,
-        "http://private-api-preprod.bpartners.app/ping",
+        "https://internal-api-preprod.bpartners.app/ping",
         status=429)
     # 3 retries
     responses.add(
         responses.GET,
-        "http://private-api-preprod.bpartners.app/ping",
+        "https://internal-api-preprod.bpartners.app/ping",
         status=429)
     responses.add(
         responses.GET,
-        "http://private-api-preprod.bpartners.app/ping",
+        "https://internal-api-preprod.bpartners.app/ping",
         status=429)
     responses.add(
         responses.GET,
-        "http://private-api-preprod.bpartners.app/ping",
+        "https://internal-api-preprod.bpartners.app/ping",
         status=200)
 
     response = app.lambda_handler(apigw_ping_event, "")
 
     assert response["statusCode"] == 200
 
+@mock.patch.dict(os.environ, { "TARGET_HOST_TEMPLATE": "private-<original_host>", "TARGET_PROTOCOL": "http" })
 @responses.activate
 def test_ping_is_known_too_late(apigw_ping_event):
     # 1 try
@@ -107,6 +113,7 @@ def test_ping_is_known_too_late(apigw_ping_event):
     assert response["statusCode"] == 500
     assert "GiveUpRetryError" in response["body"]
 
+@mock.patch.dict(os.environ, { "TARGET_HOST_TEMPLATE": "private-<original_host>", "TARGET_PROTOCOL": "http" })
 @responses.activate
 def test_post_non_b64(apigw_post_non_b64_event):
     responses.add(
@@ -121,6 +128,7 @@ def test_post_non_b64(apigw_post_non_b64_event):
 
     assert response["statusCode"] == 200
 
+@mock.patch.dict(os.environ, { "TARGET_HOST_TEMPLATE": "private-<original_host>", "TARGET_PROTOCOL": "http" })
 @responses.activate
 def test_post_b64(apigw_post_b64_event):
     responses.add(
@@ -135,6 +143,7 @@ def test_post_b64(apigw_post_b64_event):
 
     assert response["statusCode"] == 200
 
+@mock.patch.dict(os.environ, { "TARGET_HOST_TEMPLATE": "private-<original_host>", "TARGET_PROTOCOL": "http" })
 @responses.activate
 def test_query_params_are_forwarded(apigw_get_with_query_params_event):
     responses.add(
@@ -146,6 +155,7 @@ def test_query_params_are_forwarded(apigw_get_with_query_params_event):
 
     assert response["statusCode"] == 200
 
+@mock.patch.dict(os.environ, { "TARGET_HOST_TEMPLATE": "private-<original_host>", "TARGET_PROTOCOL": "http" })
 @responses.activate
 def test_headers_are_forwarded(apigw_get_with_two_headers_event):
     responses.add(

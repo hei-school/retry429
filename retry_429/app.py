@@ -4,19 +4,18 @@ import avereno
 import logging
 import datetime
 import base64
+import os
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def to_retryable_host(original_host):
-    """Info(rewrite)"""
-    return "private-" + original_host
+    target_host_template = os.environ['TARGET_HOST_TEMPLATE']
+    return target_host_template.replace("<original_host>", original_host)
 
 def to_retryable_url(original_host, path):
-    """Info(rewrite):
-       Rewrites original url to a different one
-       so that retry429 is not infinitely looping over itself"""
-    return "http://" + to_retryable_host(original_host) + path
+    protocol = os.environ['TARGET_PROTOCOL']
+    return f"{protocol}://{to_retryable_host(original_host)}{path}"
 
 def reject_429(response, host, endpoint):
     if response.status_code == 429:
