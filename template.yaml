@@ -15,8 +15,16 @@ Parameters:
       - http
       - https
   RetriedHttpStatuses:
-    Type: CommaDelimitedList
+    Type: String
     Description: Comma-separated HTTP statuses such as 429,503
+  SubnetIds:
+    Type: String
+    Description: Comma-separated subnetIds such as subnetId1,subnetId2
+    Default: ''
+  SecurityGroupIds:
+    Type: String
+    Description: Comma-separated SecurityGroupIds such as sgId1,sgId2
+    Default: ''
 
 Globals:
   Function:
@@ -28,6 +36,11 @@ Globals:
         TargetHostTemplate: !Ref TargetHostTemplate
         TargetProtocol: !Ref TargetProtocol
         RetriedHttpStatuses: !Ref RetriedHttpStatuses
+        SubnetIds: !Ref SubnetIds
+        SecurityGroupIds: !Ref SecurityGroupIds
+
+Conditions:
+  HasExplicitVpcConfig: !Not [ !Equals [ '', !Ref SubnetIds ] ]
 
 Resources:
   Retry429Function:
@@ -38,6 +51,17 @@ Resources:
       Runtime: python3.10
       Architectures:
         - arm64
+      VpcConfig:
+        SubnetIds:
+          'Fn::If':
+            - HasExplicitVpcConfig
+            - !Split [ ',', !Ref SubnetIds ]
+            - [ ]
+        SecurityGroupIds:
+          'Fn::If':
+            - HasExplicitVpcConfig
+            - !Split [ ',', !Ref SecurityGroupIds ]
+            - [ ]
       Events:
         AnyCall:
           Type: HttpApi
