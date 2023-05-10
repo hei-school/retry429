@@ -16,7 +16,7 @@ Parameters:
       - https
   RetriedHttpStatuses:
     Type: String
-    Description: Comma-separated HTTP statuses such as 420-503
+    Description: Comma-separated HTTP statuses such as 429,503
 
 Globals:
   Function:
