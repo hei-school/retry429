@@ -15,7 +15,7 @@ Parameters:
       - http
       - https
   RetriedHttpStatuses:
-    Type: String
+    Type: CommaDelimitedList
     Description: Comma-separated HTTP statuses such as 429,503
 
 Globals:
