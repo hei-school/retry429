@@ -1,4 +1,5 @@
 import requests
+import urllib
 import json
 import avereno
 import logging
@@ -46,12 +47,15 @@ def lambda_handler(event, context):
     headers = event["headers"]
     original_host = headers["host"]
     retryable_host = to_retryable_host(original_host)
+    encoded_params = urllib.parse.urlencode(
+        event.get("queryStringParameters", ""),
+        safe=os.environ.get("SafeParamsChars", ""))
     request_rejecting_bad_http_statuses = lambda: reject_bad_http_statuses(
         requests.request(
             method=method,
             headers={**headers, "host": retryable_host},
             url=to_retryable_url(original_host, path),
-            params=event.get("queryStringParameters", None),
+            params=encoded_params,
             data=encoded_payload_from_event(event)
         ),
         retryable_host,
