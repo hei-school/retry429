@@ -1,5 +1,6 @@
 import requests
 import urllib
+import urllib3.util.url as urllib3_url
 import json
 import avereno
 import logging
@@ -50,6 +51,7 @@ def lambda_handler(event, context):
     encoded_params = urllib.parse.urlencode(
         event.get("queryStringParameters", ""),
         safe=os.environ.get("SafeParamsChars", ""))
+    urllib3_url._encode_invalid_chars = lambda component, _allowed_chars: component
     request_rejecting_bad_http_statuses = lambda: reject_bad_http_statuses(
         requests.request(
             method=method,
@@ -61,7 +63,7 @@ def lambda_handler(event, context):
         retryable_host,
         endpoint
     )
-    
+
     max_sleep = datetime.timedelta(seconds=10)
     try:
         response = avereno.retry(
