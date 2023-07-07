@@ -25,10 +25,6 @@ Parameters:
     Type: String
     Description: Comma-separated SecurityGroupIds such as sgId1,sgId2
     Default: ''
-  SafeParamsChars:
-    Type: String
-    Description: Characters in queryParams that _not_ to be encoded as they are safe, such as []
-    Default: ''
 
 Globals:
   Function:
@@ -42,7 +38,6 @@ Globals:
         RetriedHttpStatuses: !Ref RetriedHttpStatuses
         SubnetIds: !Ref SubnetIds
         SecurityGroupIds: !Ref SecurityGroupIds
-        SafeParamsChars: !Ref SafeParamsChars
 
 Conditions:
   HasExplicitVpcConfig: !Not [ !Equals [ '', !Ref SubnetIds ] ]

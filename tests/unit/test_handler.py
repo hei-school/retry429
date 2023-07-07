@@ -159,23 +159,7 @@ def test_query_params_are_forwarded(apigw_get_with_query_params_event):
 
     assert response["statusCode"] == 200
 
-@mock.patch.dict(os.environ, { "TargetHostTemplate": "private-<original_host>", "TargetProtocol": "http" })
-@responses.activate
-def test_query_params_are_encoded_by_default(apigw_get_with_unsafe_query_params_event):
-    def request_callback(request):
-        assert request.path_url == "/thepath?param1=t%5Bvalue1%5D"
-        return (200, {}, b"{}")
-    responses.add_callback(
-        responses.GET,
-        "http://private-api-preprod.bpartners.app/thepath?param1=t[value1]",
-        callback=request_callback,
-    )
-
-    response = app.lambda_handler(apigw_get_with_unsafe_query_params_event, "")
-
-    assert response["statusCode"] == 200
-
-@mock.patch.dict(os.environ, { "TargetHostTemplate": "private-<original_host>", "TargetProtocol": "http", "SafeParamsChars": "[]" })
+@mock.patch.dict(os.environ, { "TargetHostTemplate": "private-<original_host>", "TargetProtocol": "http"})
 @responses.activate
 def test_safe_query_params_are_not_encoded(apigw_get_with_unsafe_query_params_event):
     def request_callback(request):

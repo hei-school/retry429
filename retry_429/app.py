@@ -1,5 +1,4 @@
 import requests
-import urllib
 import urllib3.util.url as urllib3_url
 import json
 import avereno
@@ -48,16 +47,15 @@ def lambda_handler(event, context):
     headers = event["headers"]
     original_host = headers["host"]
     retryable_host = to_retryable_host(original_host)
-    encoded_params = urllib.parse.urlencode(
-        event.get("queryStringParameters", ""),
-        safe=os.environ.get("SafeParamsChars", ""))
+    params_str = "&".join(
+        "%s=%s" % (k,v) for k,v in event.get("queryStringParameters", {}).items())
     urllib3_url._encode_invalid_chars = lambda component, _allowed_chars: component
     request_rejecting_bad_http_statuses = lambda: reject_bad_http_statuses(
         requests.request(
             method=method,
             headers={**headers, "host": retryable_host},
             url=to_retryable_url(original_host, path),
-            params=encoded_params,
+            params=params_str,
             data=encoded_payload_from_event(event)
         ),
         retryable_host,
